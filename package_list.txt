@@ -1,0 +1,8 @@
+bash
+curl
+git
+sudo
+tzdata
+wget
+yq
+zip

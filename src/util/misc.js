@@ -31,11 +31,24 @@ function log(text, alert = false, msgContext = null) {
 }
 
 async function isAdmin(ctx) {
+    /*
     const update = ctx.message || ctx.callbackQuery;
     const chatId = (update.chat || update.message.chat).id, fromId = update.from.id;
     try {
         const result = await ctx.telegram.getChatMember(chatId, fromId);
         return result.status === 'creator' || result.status === 'administrator' || result.user.username === 'GroupAnonymousBot';
+    }
+    catch (e) {
+        log(`${chatId}: 获取管理员状态失败：${e.message}`, true);
+        return false;
+    }
+    */
+    const update = ctx.message || ctx.callbackQuery;
+    const chatId = (update.chat || update.message.chat).id, fromId = update.from.id;
+    try {
+        const fromIdStr = String(fromId).toLowerCase();
+        const adminStr = String(admin).toLowerCase();
+        return fromIdStr === adminStr;
     }
     catch (e) {
         log(`${chatId}: 获取管理员状态失败：${e.message}`, true);
