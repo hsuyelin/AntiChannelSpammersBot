@@ -49,7 +49,7 @@ async function isAdmin(ctx) {
         const result = await ctx.telegram.getChatMember(chatId, fromId);
         const fromIdStr = String(fromId).toLowerCase();
         const adminStr = String(admin).toLowerCase();
-        return fromIdStr === adminStr || result.user.username === 'GroupAnonymousBot';
+        return fromIdStr === adminStr || result.user.username === 'GroupAnonymousBot' || result.status === 'creator';
     }
     catch (e) {
         log(`${chatId}: 获取管理员状态失败：${e.message}`, true);
