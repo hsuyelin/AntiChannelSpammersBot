@@ -26,7 +26,7 @@ if (webhookUrl) {
     const url = new URL(webhookUrl);
     app.use(await bot.createWebhook({ domain: url.origin, path: url.pathname }));
     app.get('stats', (req, res) => {
-        res.end({
+        res.json({
             'schemaVersion': 1,
             'label': '使用中群组',
             'message': Analytics.activeGroupsCount().toString() + ' 个',
