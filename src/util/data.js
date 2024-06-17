@@ -15,18 +15,25 @@ let chatsList = {};
 
 class Data {
     static save() {
-        if (!existsSync('./data'))
+        if (!existsSync('./data')) {
             mkdirSync('./data');
-        writeFileSync('./data/chatsList.json', JSON.stringify(chatsList));
+        }
+        writeFileSync('./data/chatsList.json', JSON.stringify(chatsList, null, 2));
+        log('数据已保存');
     }
 
     static load() {
         try {
-            Object.assign(chatsList, JSON.parse(readFileSync('./data/chatsList.json', 'utf-8')));
-            log('加载数据成功');
-        }
-        catch (err) {
+            if (existsSync('./data/chatsList.json')) {
+                Object.assign(chatsList, JSON.parse(readFileSync('./data/chatsList.json', 'utf-8')));
+                log('加载数据成功');
+            } else {
+                log('未发现数据文件，已创建空数据');
+                this.save();
+            }
+        } catch (err) {
             log(`未发现数据或恢复失败，已重新创建数据，报错信息：${err.message}`);
+            this.save();
         }
     }
 
@@ -43,58 +50,46 @@ class Data {
     static checkChat(chatId) {
         if (typeof chatsList[chatId] === 'undefined') {
             chatsList[chatId] = deepClone(template);
-        }
-        else {
-            for (let a in template) {
-                if (typeof chatsList[chatId][a] === 'undefined') {
-                    chatsList[chatId][a] = deepClone(template[a]);
+        } else {
+            for (let key in template) {
+                if (typeof chatsList[chatId][key] === 'undefined') {
+                    chatsList[chatId][key] = deepClone(template[key]);
                 }
             }
         }
     }
 }
 
-// https://segmentfault.com/a/1190000018903274
 function deepClone(obj) {
-    let copy;
+    if (obj === null || typeof obj !== 'object') return obj;
 
-    // Handle the 3 simple types, and null or undefined
-    if (null == obj || 'object' != typeof obj) return obj;
-
-    // Handle Date
     if (obj instanceof Date) {
-        copy = new Date();
+        const copy = new Date();
         copy.setTime(obj.getTime());
         return copy;
     }
 
-    // Handle Array
-    if (obj instanceof Array) {
-        copy = [];
-        for (let i = 0, len = obj.length; i < len; i++) {
-            copy[i] = deepClone(obj[i]);
-        }
-        return copy;
+    if (Array.isArray(obj)) {
+        return obj.map(item => deepClone(item));
     }
 
-    // Handle Function
     if (obj instanceof Function) {
-        copy = function () {
+        return function() {
             return obj.apply(this, arguments);
         };
-        return copy;
     }
 
-    // Handle Object
     if (obj instanceof Object) {
-        copy = {};
-        for (let attr in obj) {
-            if (obj.hasOwnProperty(attr)) copy[attr] = deepClone(obj[attr]);
+        const copy = {};
+        for (const attr in obj) {
+            if (obj.hasOwnProperty(attr)) {
+                copy[attr] = deepClone(obj[attr]);
+            }
         }
         return copy;
     }
 
-    throw new Error('Unable to copy obj as type isn\'t supported ' + obj.constructor.name);
+    throw new Error(`Unable to copy obj as type isn't supported ${obj.constructor.name}`);
 }
 
 export default Data;
