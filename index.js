@@ -25,6 +25,21 @@ const startBot = async () => {
     if (webhookUrl) {
         const app = express();
         const url = new URL(webhookUrl);
+
+        log(`Webhook URL: ${webhookUrl}`);
+        log(`Webhook Port: ${webhookPort}`);
+
+        app.use((req, res, next) => {
+            try {
+                log(`Received request: ${req.method} ${req.url}`);
+                log(`Headers: ${JSON.stringify(req.headers, null, 2)}`);
+                log(`Body: ${JSON.stringify(req.body, null, 2)}`);
+            } catch (err) {
+                log(`Error logging request: ${err.message}`, true);
+            }
+            next();
+        });
+
         const webhookMiddleware = await bot.createWebhook({ domain: url.origin, path: url.pathname });
         app.use(webhookMiddleware);
 
