@@ -44,14 +44,19 @@ const startBot = async () => {
         app.use(webhookMiddleware);
 
         app.get('/stats', (req, res) => {
-            res.json({
+            const statsJson = {
                 'schemaVersion': 1,
                 'label': '使用中群组',
-                'message': Analytics.activeGroupsCount().toString() + ' 个',
+                'message': `${Analytics.activeGroupsCount()} 个`,
                 'color': '#26A5E4',
                 'namedLogo': 'Telegram',
                 'style': 'flat'
-            });
+            };
+
+            log(`Received request for /stats`);
+            log('Stats JSON:', JSON.stringify(statsJson, null, 2));
+
+            res.json(statsJson);
         });
 
         app.listen(webhookPort, () => log(`已设置 WebHook, Express 服务器正在监听 ${webhookPort} 端口`));
