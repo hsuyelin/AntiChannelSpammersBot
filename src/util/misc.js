@@ -116,6 +116,6 @@ function generateKeyboard(chatId, isWhitelist) {
 
 setInterval(() => {
     Data.backup();
-}, 1000 * 3600);
+}, 24 * 3600 * 1000);
 
 export { ChatType, log, hasCommand, generateKeyboard, isAdmin };
